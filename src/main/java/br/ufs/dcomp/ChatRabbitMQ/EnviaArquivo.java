@@ -3,8 +3,7 @@ package br.ufs.dcomp.ChatRabbitMQ;
 import com.rabbitmq.client.*;
 import java.nio.file.*;
 
-public class EnviaArquivo extends Thread 
-{
+public class EnviaArquivo extends Thread {
     
     private byte[] MESSAGE;
     private String QUEUE_NAME;
@@ -13,8 +12,8 @@ public class EnviaArquivo extends Thread
     private String PATH_ARCHIVE;
     private String EXCHANGE_NAME_ARCHIVE;
     
-    public EnviaArquivo(byte[] MESSAGE, String QUEUE_NAME, String QUEUE_NAME_ARCHIVE, String EXCHANGE_NAME, String EXCHANGE_NAME_ARCHIVE, String PATH_ARCHIVE)
-    {
+    public EnviaArquivo(byte[] MESSAGE, String QUEUE_NAME, String QUEUE_NAME_ARCHIVE, String EXCHANGE_NAME, String EXCHANGE_NAME_ARCHIVE, String PATH_ARCHIVE){
+        
         this.MESSAGE = MESSAGE;
         this.QUEUE_NAME = QUEUE_NAME;
         this.QUEUE_NAME_ARCHIVE = QUEUE_NAME_ARCHIVE;
@@ -27,10 +26,10 @@ public class EnviaArquivo extends Thread
     public void run(){
         try{
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("beaver.rmq.cloudamqp.com"); // Alterar
-            factory.setUsername("ekqplyqf"); // Alterar
-            factory.setPassword("qhMwhQEYGsdRMP0kWKcnbHHpiKy4g7sI"); // Alterar
-            factory.setVirtualHost("ekqplyqf");
+            factory.setHost("LoadBalancer2-e12cd53c22f9d99f.elb.us-east-1.amazonaws.com"); // Alterar
+            factory.setUsername("tulasi"); // Alterar
+            factory.setPassword("try@g@1n"); // Alterar
+            factory.setVirtualHost("/");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
             

@@ -8,7 +8,7 @@ tarcisio, marciocosta, faviosantos, monicaferraz
 @marciocosta>> 
 ```
 
-## Listar todos os grupos
+## Listar todos os grupos de um usuario
 
 O chat deve disponibilizar operação para listar todos os grupos dos quais o usuário corrente faz parte. Ex:
 
@@ -18,4 +18,5 @@ ufs, amigos, familia
 @marciocosta>> 
 ```
 
-Para implementar essas operações, deve-se usar a API HTTP de Gerenciamento do RabbitMQ: https://rawcdn.githack.com/rabbitmq/rabbitmq-management/v3.7.7/priv/www/api/index.html
+Para implementar essas operações, deve-se usar a API HTTP de Gerenciamento do 
+RabbitMQ: https://rawcdn.githack.com/rabbitmq/rabbitmq-management/v3.7.7/priv/www/api/index.html

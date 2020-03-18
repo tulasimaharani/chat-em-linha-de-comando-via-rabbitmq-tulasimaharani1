@@ -52,14 +52,26 @@ public class Chat {
     byte[] buffer = pacote.toByteArray();
     return buffer;
   }
+  
+  public static void printComandoInvalido(){
+    System.out.println("Comando invalido!\n" + 
+                "Exemplo de comandos:\n" +
+                " !addGroup amigos\n" +
+                " !addUser joaosantos amigos\n" +
+                " !delFromGroup joaosantos amigos\n" +
+                " !removeGroup amigos\n" +
+                " !upload /home/tarcisio/aula1.pdf\n" +
+                " !listUsers amigos\n" +
+                " !listGroups\n");
+  }
 
   public static void main(String[] argv) throws Exception {
     // Cria conexão
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("beaver.rmq.cloudamqp.com"); // Alterar
-    factory.setUsername("ekqplyqf"); // Alterar
-    factory.setPassword("qhMwhQEYGsdRMP0kWKcnbHHpiKy4g7sI"); // Alterar
-    factory.setVirtualHost("ekqplyqf");
+    factory.setHost("LoadBalancer2-e12cd53c22f9d99f.elb.us-east-1.amazonaws.com"); // Alterar
+    factory.setUsername("tulasi"); // Alterar
+    factory.setPassword("try@g@1n"); // Alterar
+    factory.setVirtualHost("/");
     Connection connection = factory.newConnection();
     Channel channel = connection.createChannel();
     
@@ -150,7 +162,6 @@ public class Chat {
                        //(queue-name, autoAck, consumer);  
       channel.basicConsume(userArchive, true,    consumerArchive);
 
-
       System.out.print(prompt);
       String input = in.nextLine();
       
@@ -190,15 +201,9 @@ public class Chat {
         // Comandos
         case '!': {
           String[] comando = input.split("\\s");
-          if(comando.length < 2){
-            System.out.println("Comando invalido!\n" + 
-              "Exemplo de comandos:\n" +
-              " !addGroup amigos\n" +
-              " !addUser joaosantos amigos\n" +
-              " !delFromGroup joaosantos amigos\n" +
-              " !removeGroup amigos\n" +
-              " !upload /home/tarcisio/aula1.pdf\n");
-              break;
+          if(comando.length < 2 && !comando[0].equals("!listGroups")){
+            printComandoInvalido();
+            break; 
           }
           switch (comando[0]) {
             // Cria um novo grupo
@@ -222,13 +227,7 @@ public class Chat {
             // !addUser joaosantos amigos
             case "!addUser": {
               if(comando.length < 3){
-                System.out.println("Comando invalido!\n" + 
-                  "Exemplo de comandos:\n" +
-                  " !addGroup amigos\n" +
-                  " !addUser joaosantos amigos\n" +
-                  " !delFromGroup joaosantos amigos\n" +
-                  " !removeGroup amigos\n" +
-                  " !upload /home/tarcisio/aula1.pdf\n");
+                printComandoInvalido();
                 break; 
               }
 
@@ -258,13 +257,7 @@ public class Chat {
             // !delFromGroup joaosantos amigos
             case "!delFromGroup": {
               if(comando.length < 3){
-                System.out.println("Comando invalido!\n" + 
-                  "Exemplo de comandos:\n" +
-                  " !addGroup amigos\n" +
-                  " !addUser joaosantos amigos\n" +
-                  " !delFromGroup joaosantos amigos\n" +
-                  " !removeGroup amigos\n" +
-                  " !upload /home/tarcisio/aula1.pdf\n");
+                printComandoInvalido();
                 break;
               }
               
@@ -319,15 +312,29 @@ public class Chat {
               }
               break;
             }
-            default: {
-              System.out.println("Comando invalido!\n" + 
-              "Exemplo de comandos:\n" +
-              " !addGroup amigos\n" +
-              " !addUser joaosantos amigos\n" +
-              " !delFromGroup joaosantos amigos\n" +
-              " !removeGroup amigos\n" +
-              " !upload /home/ubuntu/environment/etapa0.md\n");
+            // Lista todos os usuários em um dado grupo 
+            // !listUsers ufs
+            case "!listUsers": {
+              String grupo = comando[1];
+              String currentUser = "";
+              grupo = "/api/exchanges/%2f/" + grupo + "/bindings/source"; // lista todos os binds que tem o exchange grupo como source
+              RestClient client = new RestClient(grupo, currentUser);
+              client.run();
+            	break;
+            }   
+            // Listar todos os grupos
+            // !listGroups
+            case "!listGroups": {
+              String grupo = "";
+              String currentUser = "/api/queues/%2f/" + user + "/bindings"; // lista todos os binds que a queue user possui	
+              RestClient client = new RestClient(grupo, currentUser);
+              client.run();
               break;
+            }
+            
+            default: {
+              printComandoInvalido();
+              break; 
             }
           }
           break;
