@@ -67,6 +67,7 @@ public class Chat {
 
   public static void main(String[] argv) throws Exception {
     // Cria conexão
+    /*
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("LoadBalancer2-e12cd53c22f9d99f.elb.us-east-1.amazonaws.com"); // Alterar
     factory.setUsername("tulasi"); // Alterar
@@ -74,6 +75,18 @@ public class Chat {
     factory.setVirtualHost("/");
     Connection connection = factory.newConnection();
     Channel channel = connection.createChannel();
+    */
+    ConnectionFactory factory = new ConnectionFactory();
+    factory.setHost("beaver.rmq.cloudamqp.com"); // Alterar
+    factory.setUsername("ekqplyqf"); // Alterar
+    factory.setPassword("qhMwhQEYGsdRMP0kWKcnbHHpiKy4g7sI"); // Alterar
+    factory.setVirtualHost("ekqplyqf");
+    Connection connection = factory.newConnection();
+    Channel channel = connection.createChannel();
+    
+    // Variaveis Globais
+    String EXCHANGE_NAME = ".";
+    String EXCHANGE_NAME_ARCHIVE = ".";
     
     // Define usuario
     String user = createUser();
@@ -81,19 +94,17 @@ public class Chat {
     
     // Cria fila do usuario no RabbitMQ para mensagens e para arquivos
     String QUEUE_NAME = user;
+    String QUEUE_NAME_ARCHIVE = userArchive;
                      // (queue-name, durable, exclusive, auto-delete, params); 
     channel.queueDeclare(QUEUE_NAME, false,   false,     false,       null);
-    
-    String QUEUE_NAME_ARCHIVE = userArchive;
     channel.queueDeclare(QUEUE_NAME_ARCHIVE, false,   false,     false,       null);
     
-    // Inicialização de variaveis
-    String EXCHANGE_NAME = ".";
-    String EXCHANGE_NAME_ARCHIVE = ".";
-    // Captura e envio de mensagens 
     String prompt = ">>";
     Scanner in = new Scanner(System.in); 
+    
+    // Captura e envio de mensagens 
     while(true){
+      
       // Recebe as mensagens 
       Consumer consumer = new DefaultConsumer(channel) {
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)           throws IOException {
@@ -122,7 +133,7 @@ public class Chat {
       // Publica as mensagens recebidas na fila do usuario
                    //(queue-name, autoAck, consumer);    
       channel.basicConsume(user, true,    consumer);
-      
+        
       // Recebe os arquivos
       Consumer consumerArchive = new DefaultConsumer(channel) {
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)           throws IOException {
@@ -161,7 +172,7 @@ public class Chat {
       // Publica os arquivos recebidos na fila de arquivos do usuario
                        //(queue-name, autoAck, consumer);  
       channel.basicConsume(userArchive, true,    consumerArchive);
-
+      
       System.out.print(prompt);
       String input = in.nextLine();
       
@@ -238,6 +249,8 @@ public class Chat {
               EXCHANGE_NAME = comando[2];
               EXCHANGE_NAME_ARCHIVE = EXCHANGE_NAME + "Arquivo";
               // Cria a queue do usuario
+              // Operações com queue inexistente é proibido, então 
+              // caso o user ja exista é ignorado
                                 //(queue-name, durable, exclusive, auto-delete, params); 
               channel.queueDeclare(QUEUE_NAME, false,   false,     false,       null);
               channel.queueDeclare(QUEUE_NAME_ARCHIVE, false,   false,     false,       null);
@@ -317,7 +330,7 @@ public class Chat {
             case "!listUsers": {
               String grupo = comando[1];
               String currentUser = "";
-              grupo = "/api/exchanges/%2f/" + grupo + "/bindings/source"; // lista todos os binds que tem o exchange grupo como source
+              grupo = "/api/exchanges/ekqplyqf/" + grupo + "/bindings/source"; // Path que lista todos os binds que tem o exchange grupo como source
               RestClient client = new RestClient(grupo, currentUser);
               client.run();
             	break;
@@ -326,7 +339,7 @@ public class Chat {
             // !listGroups
             case "!listGroups": {
               String grupo = "";
-              String currentUser = "/api/queues/%2f/" + user + "/bindings"; // lista todos os binds que a queue user possui	
+              String currentUser = "/api/queues/ekqplyqf/" + user + "/bindings"; // Path que lista todos os binds que a queue user possui	
               RestClient client = new RestClient(grupo, currentUser);
               client.run();
               break;

@@ -25,6 +25,7 @@ public class EnviaArquivo extends Thread {
     
     public void run(){
         try{
+            /*
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("LoadBalancer2-e12cd53c22f9d99f.elb.us-east-1.amazonaws.com"); // Alterar
             factory.setUsername("tulasi"); // Alterar
@@ -32,20 +33,31 @@ public class EnviaArquivo extends Thread {
             factory.setVirtualHost("/");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
+            */
+            
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost("beaver.rmq.cloudamqp.com"); // Alterar
+            factory.setUsername("ekqplyqf"); // Alterar
+            factory.setPassword("qhMwhQEYGsdRMP0kWKcnbHHpiKy4g7sI"); // Alterar
+            factory.setVirtualHost("ekqplyqf");
+            Connection connection = factory.newConnection();
+            Channel channel = connection.createChannel();
             
             if(EXCHANGE_NAME.isEmpty()){
-                // Publica as mensagens enviadas na queue do receptor
+                // Publica os arquivos enviados na queue do receptor
                                 //  (exchange, routingKey, props, message-body); 
                 channel.basicPublish("", QUEUE_NAME_ARCHIVE, null, MESSAGE);
                 System.out.println("Arquivo \"" + PATH_ARCHIVE + "\" foi enviado para @" + QUEUE_NAME);
             }else{
-                // Publica as mensagens enviadas na exchange do grupo
+                // Publica os arquivos enviados na exchange do grupo
                                 //  (exchange, routingKey, props, message-body); 
                 channel.basicPublish(EXCHANGE_NAME_ARCHIVE, "" , null, MESSAGE);
                 System.out.println("Arquivo \"" + PATH_ARCHIVE + "\" foi enviado para #" + EXCHANGE_NAME);
             }
         } catch (Exception e){
-            
+            System.out.println("Não foi possivel enviar o arquivo!\n" +
+                            "Confira se o caminho está correto!\n" +
+                            "Ex: /home/ubuntu/environment/arquivo.tipo\n");
         }
     }
 }
